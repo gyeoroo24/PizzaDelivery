@@ -26,7 +26,7 @@
                         <!--Note that size is a custom class to modify tailwind css-->
                         <div class="flex items-center justify-around mt-6">
                             <span class="text-lg font-bold"> &#8377; <%=pizza.price%></span>
-                            <button class="add-to-cart flex px-6 py-1 rounded-full items-center font-bold">
+                            <button data-pizza="<%=JSON.stringify(pizza)%>" class="add-to-cart flex px-6 py-1 rounded-full items-center font-bold">
                                 <span>+</span>
                                 <span class="ml-4">Add</span>
                             </button>
