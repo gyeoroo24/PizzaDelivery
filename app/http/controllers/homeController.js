@@ -4,13 +4,32 @@
 
 //The controllers make use of factory-methods
 
+const Menu = require('../../models/menu');
+
 function homeController()
 {
     //This controller returns an object which has methods
     return {
+
+        //Approach - 1 
+        
+        /*
         index(req,res){
-            res.render('home');
+            Menu.find().then((pizzas) => {  //finds all the items and stores it in pizzas
+                console.log(pizzas);
+                res.render('home',{pizzas:pizzas}); //sends pizzas to home page
+            })
+            
+
         }
+
+        */
+        async index(req,res){
+            const pizzas = await Menu.find() 
+            console.log(pizzas);
+            res.render('home',{pizzas:pizzas}); //sends pizzas to home page
+        }
+            
 
         //above can also be written as 
         /*
