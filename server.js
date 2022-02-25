@@ -7,7 +7,8 @@ const app = express();
 const mongoose = require('mongoose');
 const session = require('express-session');
 const flash = require('express-flash');
-const MongoDBStore = require('connect-mongo'); 
+const MongoDBStore = require('connect-mongo');
+const passport = require('passport');
 
 //Database Connection
 
@@ -22,6 +23,8 @@ connection.on('error', console.error.bind(console, 'connection error:'));
    // we're connected!
    console.log("DATABASE CONNECTION OPENED!!");
 });
+
+
 
 //Session Store
 
@@ -38,6 +41,15 @@ app.use(session({
     cookie : { maxAge : 1000 * 60 * 60 * 24}    //24 hrs
 }))
 
+//Passport --Used for login
+
+
+const passportInit = require('./app/config/passport');
+passportInit(passport);     //Passing passport to config's passport.js
+app.use(passport.initialize());
+app.use(passport.session());
+
+
 
 //Express-Flash
 
@@ -53,6 +65,9 @@ app.set('view engine','ejs');
 //Assets ----using static middleware to apply css
 
 app.use(express.static('public'));
+
+app.use(express.urlencoded({extended:false}));  //Use to receive data other than json like in register
+
 app.use(express.json());    //To use default as json in terminal so that it doesn't give undefined object
 //Calling function initRoutes from web.js
 
@@ -60,6 +75,7 @@ app.use(express.json());    //To use default as json in terminal so that it does
 
 app.use((req,res,next)=>{
     res.locals.session = req.session,
+    res.locals.user = req.user,
     next()  //Used to proceed for next work.If we don't call this , then it will keep buferring
     //and won't move forward
 })
