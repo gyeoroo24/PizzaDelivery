@@ -1,4 +1,6 @@
 @import './variables';
+@import '~noty/src/noty.scss';
+@import '~noty/src/themes/mint.scss';
 
 body{
     font-family: 'Lato',sans-serif;
@@ -36,7 +38,11 @@ section.hero{
         color:$pure;
         background: $primary;
         border-color: $pure;
+    };
+    &:focus{
+        outline: none;
     }
+
 }
 
 .btn-primary{
@@ -74,4 +80,10 @@ section.register{
             color: $primary-hover;
         };
     };
+}
+
+.noty_theme__mint{
+    border-radius: 50px!important;
+    padding-left: 8px!important;
+    
 }

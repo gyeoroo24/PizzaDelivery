@@ -38,6 +38,7 @@ app.use(session({
     cookie : { maxAge : 1000 * 60 * 60 * 24}    //24 hrs
 }))
 
+
 //Express-Flash
 
 app.use(flash());
@@ -50,9 +51,19 @@ app.set('views',path.join(__dirname,'/resources/views'));
 app.set('view engine','ejs');
 
 //Assets ----using static middleware to apply css
-app.use(express.static('public'));
 
+app.use(express.static('public'));
+app.use(express.json());    //To use default as json in terminal so that it doesn't give undefined object
 //Calling function initRoutes from web.js
+
+//Global Middleware --used to access session object everywhere(even in layout.ejs)
+
+app.use((req,res,next)=>{
+    res.locals.session = req.session,
+    next()  //Used to proceed for next work.If we don't call this , then it will keep buferring
+    //and won't move forward
+})
+
 
 require('./routes/web')(app);
 
