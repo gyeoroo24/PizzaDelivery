@@ -13,6 +13,13 @@ function authController()
         },
 
         postLogin(req,res,next){    //next is for processing further
+            const {email,password} = req.body;
+            if(!email || !password)    //If any of them is missing
+            {
+                req.flash('error','All Fields are required!');  //Used to send flash message only once per error
+                return res.redirect('/login');
+            }
+
             passport.authenticate('local',(err,user,info) => {  //info has messages. The callback here is our done function
                 if(err)
                 {
