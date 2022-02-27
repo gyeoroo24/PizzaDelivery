@@ -5,6 +5,9 @@ const passport = require('passport');
 
 function authController()
 {
+    const _getRedirectUrl = (req) => {
+        return req.user.role === 'admin' ? '/admin/orders' : '/customer/orders';
+    }
     //This controller returns an object which has methods
     return {
 
@@ -41,7 +44,8 @@ function authController()
                     }
 
                     //if there is no error 
-                    res.redirect('/');
+                    // return res.redirect('/');
+                    return res.redirect(_getRedirectUrl(req))   //_getRedirectUrl is a private method that can only be used in this file
                 })
             })(req,res,next);   //the function passport.authenticate returns a function which we need to call
             

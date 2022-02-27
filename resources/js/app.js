@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Noty from 'noty';    //used to show message after adding item to cart
+import { initAdmin } from './admin'
 
 let cartCounter = document.querySelector('#cartCounter');
 let addToCart = document.querySelectorAll('.add-to-cart');  //Selects the add button having class name add-to-cart
@@ -33,3 +34,16 @@ addToCart.forEach((btn)=>{          //For each button clicked
         updateCart(pizza);  //Send pizza object to cart
     })
 })
+
+//Remove alert after X seconds
+const alertMsg = document.querySelector('#success-alert');
+
+if(alertMsg) {
+    setTimeout(() => {
+        alertMsg.remove();
+    },2000)
+}
+
+//Admin Side Code
+
+initAdmin()
