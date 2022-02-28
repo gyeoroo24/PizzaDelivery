@@ -1,4 +1,5 @@
 import axios from 'axios';
+import moment from 'moment';
 import Noty from 'noty';    //used to show message after adding item to cart
 import { initAdmin } from './admin'
 
@@ -47,3 +48,50 @@ if(alertMsg) {
 //Admin Side Code
 
 initAdmin()
+
+//Changing order status
+
+
+let statuses = document.querySelectorAll('.status_line');   //to get all status classes/li
+let hiddenInput = document.querySelector('#hiddenInput');
+let order = hiddenInput ? hiddenInput.value : null;
+order = JSON.parse(order);
+
+let time = document.createElement('small');
+
+function updateStatus(order){
+
+    statuses.forEach((status) => {
+        status.classList.remove('step-completed')
+        status.classList.remove('current')
+    })  //For not keeping 2 completed together
+
+    let stepCompleted = true;   //first status
+
+    statuses.forEach((status)=> {
+        let dataProp = status.dataset.status    //first status is local and 2nd status is data-status in ejs
+
+        if(stepCompleted)
+        {
+            status.classList.add('step-completed'); //If the step is completed , 
+            //then select the current status (local) and add to its classList 
+            //step-completed which is manipulated in scss 
+        }
+
+        if(dataProp===order.status) //If it is on-going i.e. order-status equals dataprop
+        {
+            stepCompleted = false;  //this step is not yet completed
+            time.innerText = moment(order.updatedAt).format('hh:mm A');
+            status.appendChild(time);
+
+            if(status.nextElementSibling)   //If it is not the last status
+            {
+                status.nextElementSibling.classList.add('current'); //Then make its next element's class as current 
+                //and manipulate its color using scss
+            }
+
+        }
+    })
+}
+
+updateStatus(order);

@@ -2209,9 +2209,12 @@ function initAdmin() {
 __webpack_require__.r(__webpack_exports__);
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0__ = __webpack_require__(/*! axios */ "./node_modules/axios/index.js");
 /* harmony import */ var axios__WEBPACK_IMPORTED_MODULE_0___default = /*#__PURE__*/__webpack_require__.n(axios__WEBPACK_IMPORTED_MODULE_0__);
-/* harmony import */ var noty__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! noty */ "./node_modules/noty/lib/noty.js");
-/* harmony import */ var noty__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(noty__WEBPACK_IMPORTED_MODULE_1__);
-/* harmony import */ var _admin__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! ./admin */ "./resources/js/admin.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1__ = __webpack_require__(/*! moment */ "./node_modules/moment/moment.js");
+/* harmony import */ var moment__WEBPACK_IMPORTED_MODULE_1___default = /*#__PURE__*/__webpack_require__.n(moment__WEBPACK_IMPORTED_MODULE_1__);
+/* harmony import */ var noty__WEBPACK_IMPORTED_MODULE_2__ = __webpack_require__(/*! noty */ "./node_modules/noty/lib/noty.js");
+/* harmony import */ var noty__WEBPACK_IMPORTED_MODULE_2___default = /*#__PURE__*/__webpack_require__.n(noty__WEBPACK_IMPORTED_MODULE_2__);
+/* harmony import */ var _admin__WEBPACK_IMPORTED_MODULE_3__ = __webpack_require__(/*! ./admin */ "./resources/js/admin.js");
+
 
  //used to show message after adding item to cart
 
@@ -2222,7 +2225,7 @@ var addToCart = document.querySelectorAll('.add-to-cart'); //Selects the add but
 function updateCart(pizza) {
   axios__WEBPACK_IMPORTED_MODULE_0___default().post('/update-cart', pizza).then(function (res) {
     cartCounter.innerText = res.data.totalQty;
-    new (noty__WEBPACK_IMPORTED_MODULE_1___default())({
+    new (noty__WEBPACK_IMPORTED_MODULE_2___default())({
       type: 'success',
       timeout: 1000,
       text: "Item added to cart successfully",
@@ -2230,7 +2233,7 @@ function updateCart(pizza) {
 
     }).show();
   })["catch"](function (err) {
-    new (noty__WEBPACK_IMPORTED_MODULE_1___default())({
+    new (noty__WEBPACK_IMPORTED_MODULE_2___default())({
       type: 'error',
       timeout: 1000,
       text: "Something went wrong!",
@@ -2259,7 +2262,49 @@ if (alertMsg) {
 } //Admin Side Code
 
 
-(0,_admin__WEBPACK_IMPORTED_MODULE_2__.initAdmin)();
+(0,_admin__WEBPACK_IMPORTED_MODULE_3__.initAdmin)(); //Changing order status
+
+var statuses = document.querySelectorAll('.status_line'); //to get all status classes/li
+
+var hiddenInput = document.querySelector('#hiddenInput');
+var order = hiddenInput ? hiddenInput.value : null;
+order = JSON.parse(order);
+var time = document.createElement('small');
+
+function updateStatus(order) {
+  statuses.forEach(function (status) {
+    status.classList.remove('step-completed');
+    status.classList.remove('current');
+  }); //For not keeping 2 completed together
+
+  var stepCompleted = true; //first status
+
+  statuses.forEach(function (status) {
+    var dataProp = status.dataset.status; //first status is local and 2nd status is data-status in ejs
+
+    if (stepCompleted) {
+      status.classList.add('step-completed'); //If the step is completed , 
+      //then select the current status (local) and add to its classList 
+      //step-completed which is manipulated in scss 
+    }
+
+    if (dataProp === order.status) //If it is on-going i.e. order-status equals dataprop
+      {
+        stepCompleted = false; //this step is not yet completed
+
+        time.innerText = moment__WEBPACK_IMPORTED_MODULE_1___default()(order.updatedAt).format('hh:mm A');
+        status.appendChild(time);
+
+        if (status.nextElementSibling) //If it is not the last status
+          {
+            status.nextElementSibling.classList.add('current'); //Then make its next element's class as current 
+            //and manipulate its color using scss
+          }
+      }
+  });
+}
+
+updateStatus(order);
 
 /***/ }),
 

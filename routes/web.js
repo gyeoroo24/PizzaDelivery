@@ -4,7 +4,7 @@ const authController = require('../app/http/controllers/authController');
 const cartController = require('../app/http/controllers/customers/cartController');
 const orderController = require('../app/http/controllers/customers/orderController');
 const adminOrderController = require('../app/http/controllers/admin/orderController');
-
+const statusController = require('../app/http/controllers/admin/statusController');
 
 
 //Middlewares
@@ -45,9 +45,14 @@ function initRoutes (app) {
 
     app.get('/customer/orders',auth,orderController().index)
 
+    app.get('/customer/orders/:id',auth,orderController().show)    //:id denotes dynamic order id . Remember to use the name id in show method
+
     //Admin Routes
 
     app.get('/admin/orders',admin,adminOrderController().index)
+
+    app.post('/admin/order/status',admin,statusController().update)
+    
 };
 
 module.exports =  initRoutes;

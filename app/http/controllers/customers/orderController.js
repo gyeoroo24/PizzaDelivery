@@ -46,6 +46,19 @@ function orderController() {
             
             res.render('customers/orders',{orders : orders , moment : moment});
 
+        },
+
+        async show(req,res) {
+            const order = await Order.findById(req.params.id)    //id from web.js route and since we are getting it , we use req.param
+
+            //If the user ic authorized , then show order status else don't
+
+            if(req.user._id.toString() === order.customerId.toString()) //since both are objects , we need to convert them to string to compare them
+            {
+                return res.render('customers/singleOrder',{order})   //Pass order to the view
+            }
+
+            return res.redirect('/')
         }
     }
 }
