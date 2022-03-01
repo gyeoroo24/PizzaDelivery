@@ -45,9 +45,7 @@ if(alertMsg) {
     },2000)
 }
 
-//Admin Side Code
 
-initAdmin()
 
 //Changing order status
 
@@ -95,3 +93,48 @@ function updateStatus(order){
 }
 
 updateStatus(order);
+
+//Socket for client
+
+let socket = io();  //We receive all the methods from io() in socket
+
+//Admin Side Code
+
+initAdmin(socket)
+
+//Join
+
+if(order)   //If there is an order (received above in hiddenInput)
+{
+    socket.emit('join',`order_${order._id}`)    //emit an event called join<(user-defined)
+    //with order_id to the server
+    //order_id is for giving unique name to private room
+}
+
+//For new orders to be displayed on admin panel without refreshing
+let adminAreaPath = window.location.pathname;   //gives path name/url
+
+if(adminAreaPath.includes('admin'))
+{
+    socket.emit('join','adminRoom');   //No separate room for admins
+    //only one room which will be joined with the same function as client's
+}
+
+//For orderUpdate --received from server.js
+
+socket.on('orderUpdated',(data)=>{
+    const updatedOrder = {...order};    //first receive old order from this file
+
+    updatedOrder.updatedAt = moment().format(); //set its updatedAt time to now
+    updatedOrder.status = data.status;  //set its status to the received status
+
+    updateStatus(updatedOrder); //call the updateStatus function from this file
+    new Noty({
+        type : 'success',
+        timeout : 1000,
+        text: "Order Updated",
+        progressBar : false
+        
+      }).show();
+    //console.log(data)
+})

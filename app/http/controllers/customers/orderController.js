@@ -22,10 +22,28 @@ function orderController() {
             })
 
             order.save().then(result => {
+                //This allows us to receive name from result
+                //and we can use it in our admin.js whenever new order is found , it can be flashed
+                Order.populate(result , {path : 'customerId'} , (err,placedOrder) => {
 
-                req.flash('success','Order placed successfully');
-                delete req.session.cart;
-                res.redirect('/customer/orders');
+                    req.flash('success','Order placed successfully');
+                    
+                    //Emit an event to the admin when an order is placed
+                    const eventEmitter = req.app.get('eventEmitter');   //get the eventEmitter
+
+                    //emit orderPlaced event with the result obtained to update/flash message to the admin
+                    //Used in server.js
+                    eventEmitter.emit('orderPlaced', result);
+
+                    delete req.session.cart;
+
+                    
+                    res.redirect('/customer/orders');
+
+
+                }); 
+
+                
 
             }).catch(err => {
 

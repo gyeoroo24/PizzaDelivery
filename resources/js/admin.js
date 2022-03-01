@@ -1,7 +1,8 @@
 import axios from "axios";
 import moment from "moment";
+import Noty from "noty";
 
-export function initAdmin(){
+export function initAdmin(socket){
     const orderTableBody = document.querySelector('#orderTableBody');
 
     let orders = []
@@ -42,7 +43,7 @@ export function initAdmin(){
                     </td>
 
                     <td class="border px-4 py-2 ">
-                        ${ order.customerId.phone}
+                        ${ order.phone}
                     </td>
 
                     <td class="border px-4 py-2 ">
@@ -107,5 +108,23 @@ export function initAdmin(){
         }).join('') //Join as in works like forEach i.e. it adds other orders 
 
     }
+
+    //Socket is received from initAdmin call in app.js
+    //we receive data as order here
+    socket.on('orderPlaced',(order) =>{
+        //Flash message to admin orders page
+        new Noty({
+            type : 'success',
+            timeout : 1000,
+            text: "New order!",
+            progressBar : false
+            
+          }).show();
+            orders.unshift(order)   //to push new order to the start
+            orderTableBody.innerHTML = ''; //empty the table first
+            orderTableBody.innerHTML = generateMarkup(orders); //generate markup including new order
+    })
+
+    
 }
 

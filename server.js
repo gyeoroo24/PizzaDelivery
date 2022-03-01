@@ -9,6 +9,7 @@ const session = require('express-session');
 const flash = require('express-flash');
 const MongoDBStore = require('connect-mongo');
 const passport = require('passport');
+const Emitter = require('events');  //for emitting event for socket.io in statusController
 
 //Database Connection
 
@@ -27,6 +28,11 @@ connection.on('error', console.error.bind(console, 'connection error:'));
 
 
 //Session Store
+
+//Event Emitter
+
+const eventEmitter = new Emitter()
+app.set('eventEmitter',eventEmitter);   //To bind with our app so that  we can use it elsewhere with the name eventEmitter
 
 //Session Config
 
@@ -85,6 +91,42 @@ require('./routes/web')(app);
 
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT , () => {
+const server = app.listen(PORT , () => {
     console.log(`Listening on port  ${PORT}`);
+})
+
+// Socket -Server Side -------->In order to use this socket on client side , we connect js file 
+//of socket io in layout.ejs and in app.js , we write the client side conde for this socket
+//We use the concept of private rooms having unique name/id as our order_id so that 
+//we can render/update on each order 
+
+//Socket IO
+const io = require('socket.io')(server)
+io.on('connection',(socket)=>{  //we receive a socket on connection
+    //Join
+
+    //console.log(socket.id); //This is socket's unique id
+
+    socket.on('join' , (orderId) => {   //on event join from client
+        //console.log(orderId);   //orderId received from client on emitting join event
+
+        socket.join(orderId);   //This is socket's join method and not join event from client
+        //we are joining the unique orderId as private room id
+    })
+
+})
+
+//From statusController
+
+eventEmitter.on('orderUpdated',(data)=>{
+    io.to(`order_${data.id}`).emit('orderUpdated',data);
+
+    //io.to means in the private room having id as data.id which is our orderId
+    //emit the status orderUpdated with the same data that we receive
+})
+
+//From customers/orderController
+
+eventEmitter.on('orderPlaced',(data)=>{
+    io.to('adminRoom').emit('orderPlaced',data);
 })
